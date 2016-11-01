@@ -3,36 +3,25 @@ var platforms;
 var player;
 
 function preload() {
-    game.load.image('background', 'res/img/background.png');
-    game.load.image('q', 'res/img/q.png');
-    game.load.image('ground', 'res/img/ground.png');
-    game.load.image('star', 'res/img/star.png');
-    game.load.spritesheet('gubbe', 'res/img/gubbe.png', 50, 50)
+    game.load.tilemap('map', 'res/maps/map1.csv', null, Phaser.Tilemap.CSV);
+    game.load.image('tiles', 'res/maps/simpleTileset64x64.png');
+    game.load.image('background', 'res/img/oldPaper.png');
+    
 }
 
+var map;
+var layer;
+var cursors;
+
 function create() {
-    game.add.sprite(0, 0, 'background');
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    platforms = game.add.group()
-    platforms.enableBody = true;
-    var ground = platforms.create(0, game.world.height - 50, 'ground');
-    ground.scale.setTo(4, 1);
-    ground.body.immovable = true;
-    var ledge = platforms.create(400, 400, 'ground');
-    ledge = platforms.create(0, 250, 'ground');
-    ledge.body.immovable = true;
-    game.add.sprite(20, 20, 'star');
+    game.add.sprite(0,0,'background');
+    map = game.add.tilemap('map', 64, 64);
+    //  Now add in the tileset
+    map.addTilesetImage('tiles');
+    layer = map.createLayer(0);
     
     // The player and its settings
     player = game.add.sprite(32, game.world.height - 150, 'gubbe');
-
-    //  We need to enable physics on the player
-    game.physics.arcade.enable(player);
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
 
     //  Our two animations, walking left and right.
     player.animations.add('left', [0, 1], 10, true);
@@ -40,5 +29,30 @@ function create() {
 }
 
 function update() {
-    var hitPlatform = game.physics.arcade.collide(player, platforms);
+    var cursors = game.input.keyboard.createCursorKeys();
+    //  Reset the players velocity (movement)
+    //  Reset the players velocity (movement)
+
+    if (cursors.left.isDown)
+    {
+        //  Move to the left
+        player.body.x = -150;
+
+        player.animations.play('left');
+    }
+    else if (cursors.right.isDown)
+    {
+        //  Move to the right
+        player.body.velocity.x = 150;
+
+        player.animations.play('right');
+    }
+    else
+    {
+        //  Stand still
+        player.animations.stop();
+
+        player.frame = 4;
+    }
+
 }
